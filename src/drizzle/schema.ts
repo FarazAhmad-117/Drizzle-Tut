@@ -1,7 +1,6 @@
+import { relations } from "drizzle-orm";
 import {
   boolean,
-  decimal,
-  index,
   integer,
   pgEnum,
   pgTable,
@@ -79,6 +78,67 @@ export const PostCategoryTable = pgTable(
   (table) => {
     return {
       pk: primaryKey({ columns: [table.postId, table.categoryId] }),
+    };
+  }
+);
+
+// DRIZZLE LEVEL REFERENCES OF RELATIONS
+
+export const UserTableRelations = relations(UserTable, ({ one, many }) => {
+  return {
+    preferences: one(UserPreferencesTable, {
+      fields: [UserTable.id],
+      references: [UserPreferencesTable.userId],
+    }),
+    posts: many(PostTable, {
+      relationName: "author",
+    }),
+  };
+});
+
+export const PostTableRelations = relations(PostTable, ({ one, many }) => {
+  return {
+    author: one(UserTable, {
+      fields: [PostTable.authorId],
+      references: [UserTable.id],
+      relationName: "author",
+    }),
+    categories: many(CategoryTable, {
+      relationName: "postCategories",
+    }),
+  };
+});
+
+export const CategoryTableRelations = relations(CategoryTable, ({ many }) => {
+  return {
+    posts: many(PostTable),
+  };
+});
+
+export const UserPreferencesTableRelations = relations(
+  UserPreferencesTable,
+  ({ one }) => {
+    return {
+      user: one(UserTable, {
+        fields: [UserPreferencesTable.userId],
+        references: [UserTable.id],
+      }),
+    };
+  }
+);
+
+export const PostCategoryTableRelations = relations(
+  PostCategoryTable,
+  ({ one }) => {
+    return {
+      post: one(PostTable, {
+        fields: [PostCategoryTable.postId],
+        references: [PostTable.id],
+      }),
+      category: one(CategoryTable, {
+        fields: [PostCategoryTable.categoryId],
+        references: [CategoryTable.id],
+      }),
     };
   }
 );

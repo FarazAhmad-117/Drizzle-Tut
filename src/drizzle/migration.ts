@@ -5,7 +5,7 @@ import postgres from "postgres";
 import fs from "fs";
 
 const certificate = fs.readFileSync("./src/certificate/ca.pem");
-console.log("Here is file:", certificate);
+// console.log("Here is file:", certificate);
 
 const migrationClient = postgres(process.env.DATABASE_URL as string, {
   max: 1,
